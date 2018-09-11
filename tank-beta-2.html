@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script  type="text/javascript" src="jquery-2.1.1.js">  </script>
+<title>Untitled Document</title>
+</head>
+<style>
+canvas{
+background-color:black;
+}
+</style>
+
+<body>
+<canvas id="monCanvas" width="600px" height="600px">
+
+
+</canvas>
+
+
+<script>
+alert('start');
+ var myCanvas= document.getElementById('monCanvas');
+ ctx=myCanvas.getContext('2d');
+ var tankX=new Array;
+ var tankY=new Array;
+ var munitionsX=new Array;
+ var munitionsY=new Array;
+ var nbrMunitions=0;
+ var posObstacleX;
+ var posObstacleY=0; 
+ var obstacleX= new Array;
+ var obstacleY= new Array;
+ var nbrObstacle=0;
+ var z=0;
+ 
+
+ tankX[0]=275;
+ tankX[1]=300;
+ tankX[2]=325;
+ tankX[3]=275;
+ tankX[4]=300;
+ tankX[5]=325;
+ tankX[6]=300;
+ tankX[7]=310;
+ tankX[8]=315;
+
+ tankY[0]=575;
+ tankY[1]=575;
+ tankY[2]=575;
+ tankY[3]=550;
+ tankY[4]=550;
+ tankY[5]=550;
+ tankY[6]=525;
+ tankY[7]=525;
+ tankY[8]=525;
+
+  var shootX;
+  var shootY;
+
+function afficher(i){
+
+   ctx.fillStyle='red';
+   if(i==1)
+   {
+   	ctx.fillStyle='black';
+   }
+   if(i!=7){
+   	if (i!=6 && i!=8) {
+   ctx.fillRect(tankX[i],tankY[i],25,25);
+   	}
+   	else
+   		ctx.fillRect(tankX[i],tankY[i],10,25);
+
+   	
+   }
+
+
+}
+function move(etat){
+
+if(etat=="left")
+{
+for(i=0;i<9;i++)
+{
+
+	if(tankX[8]+35!=600)
+	{
+
+		tankX[i]+=25;
+	}
+}
+
+}
+if(etat=="right")
+{
+for(i=0;i<9;i++)
+{
+
+	if(tankX[8]-40!=0)
+	{
+
+		tankX[i]-=25;
+	}
+}
+
+
+}
+
+  
+
+}
+ function shoot(i){
+ 
+
+ ctx.fillStyle='green';
+
+   ctx.fillRect(munitionsX[i],munitionsY[i],5,5);
+
+ }
+
+
+ function verifier(){
+
+    for(i=0;i<nbrMunitions;i++)
+    {
+
+       if(munitionsY[i]==0)
+       {
+       	nbrMunitions=i;
+       }
+       else{
+
+       	munitionsY[i]=munitionsY[i]-5;
+       }
+       
+
+    }
+
+
+
+
+
+ }
+ function genererObstacle()
+ {
+ 	 
+   for(i=0;i<10;i++)
+   {
+   	
+     posObstacleX=25+(25*Math.floor((Math.random()*25) + 1)%550);
+     obstacleX[i]=posObstacleX;
+     obstacleY[i]=posObstacleY;
+     nbrObstacle++;
+
+    }
+
+ }
+ genererObstacle();
+ function collision(){
+    
+
+    for(i=0;i<10;i++)
+    {
+      if(obstacleY[i]>=525)
+      {
+
+      	 posObstacleX=25+(25*Math.floor((Math.random()*25) + 1)%550);
+        obstacleX[i]=posObstacleX;
+        obstacleY[i]=posObstacleY;
+      }
+     for(cpt=0;cpt<nbrMunitions;cpt++)
+     {
+           if((obstacleX[i]<=munitionsX[cpt]&&obstacleX[i]+25>munitionsX[cpt])&&(obstacleY[i]<=munitionsY[cpt]&&obstacleY[i]+25>munitionsY[cpt]))
+           {
+
+              posObstacleX=25+(25*Math.floor((Math.random()*25) + 1)%550);
+              obstacleX[i]=posObstacleX;
+               obstacleY[i]=posObstacleY;
+               z=z+10;
+               document.getElementById('score').textContent=z;
+           }
+      
+     } 	
+
+
+    }
+
+
+   for(i=0;i<nbrObstacle;i++)
+   {
+
+   	obstacleY[i]+=25;
+   }
+
+    
+ }
+ 
+function update(){
+ctx.clearRect(0,0,600,600);
+for(i=0;i<9;i++)
+{
+
+ afficher(i);
+}
+$('body').keypress(function(event) {
+	
+ 
+ if(event.which===32)
+ {
+     shootX=tankX[7];
+   shootY=tankY[7]-5;
+   var exist=0;
+   for(i=0;i<=nbrMunitions;i++)
+   {
+        if(munitionsX[i]==shootX&&munitionsY[i]==shootY)
+        {
+          exist++;
+
+        }
+   }
+   if(exist==0)
+   {
+
+    nbrMunitions++;
+    if(nbrMunitions==1)
+    {
+       munitionsX[0]=shootX;
+       munitionsY[0]=shootY;
+    }
+    else
+    {
+    for(i=nbrMunitions-1;i>0;i--)
+    {
+        munitionsX[i]=munitionsX[i-1];
+        munitionsY[i]=munitionsY[i-1];    
+    }
+       munitionsX[0]=shootX;
+       munitionsY[0]=shootY;
+}
+   }
+    
+ }
+});
+if(nbrMunitions!=0)
+{
+for(i=nbrMunitions-1;i>=0;i--)
+{
+
+	shoot(i);
+}
+}
+verifier();
+ 
+
+    
+  for(i=0;i<nbrObstacle;i++)
+  {
+
+    ctx.fillStyle='blue';
+    ctx.fillRect(obstacleX[i],obstacleY[i],25,25);
+  }
+ collision();
+setTimeout(update,50);
+
+
+}
+update();
+
+$('body').keypress(function(event) {
+	
+   
+ if(event.which===122||event.which===90||event.keyCode===38)
+ {
+  alert(z);
+  move('up');
+ }
+ if(event.which===113||event.which===81||event.keyCode===37)
+ {
+  move('right');
+ }
+ if(event.which===115||event.which===83||event.keyCode===40)
+ {
+ 	move('down');
+ }
+ if(event.which===100||event.which===68||event.keyCode===39)
+ {
+ 	move('left');
+ }
+ if(event.which===112||event.which===80)
+ {
+ 	alert('!!!!!PAUSE!!!!!');
+ }
+});
+
+  
+
+
+</script>
+<center>
+  <div id="score">
+    0
+  </div>
+</center>
+</body>
+
+
+</html>
